@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, redirect } from "next/navigation"
 import Link from "next/link"
 import { useSession } from "next-auth/react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
@@ -15,6 +15,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { registerUser } from "@/app/actions"
 import { Loader2 } from "lucide-react"
 import { signOut } from "next-auth/react"
+
 
 export default function RegistrationForm() {
   const [message, setMessage] = useState("")
@@ -36,6 +37,8 @@ export default function RegistrationForm() {
     checkSubmissionStatus()
   }, [session])
 
+
+
   // Show loading state while session is being fetched
   if (status === "loading") {
     return (
@@ -45,6 +48,9 @@ export default function RegistrationForm() {
         </CardContent>
       </Card>
     )
+  }
+  else if (!session) {
+    redirect("/api/auth/signin");
   }
 
   // Show message if user has already submitted
