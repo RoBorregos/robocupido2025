@@ -1,8 +1,13 @@
+"use client"
+
 import { Heart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import { useSession } from "next-auth/react"
 
 export default function LandingSection() {
+  const { data: session } = useSession()
+  
   return (
     <section className="text-center py-24 md:py-32 lg:py-48">
       <Heart className="w-24 h-24 text-red-500 mx-auto mb-8 animate-heartbeat" />
@@ -11,7 +16,7 @@ export default function LandingSection() {
         Find your perfect match for Valentine's Day! Our AI-powered matchmaking system will pair you with your ideal
         partner. Register now and get matched on February 14th.
       </p>
-      <Link href="/register">
+      <Link href={session ? "/register" : "/login"}>
         <Button size="lg" className="text-lg px-8 py-6">
           Register Now
         </Button>
@@ -19,4 +24,3 @@ export default function LandingSection() {
     </section>
   )
 }
-

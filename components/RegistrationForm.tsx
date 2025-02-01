@@ -14,6 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { registerUser } from "@/app/actions"
 import { Loader2 } from "lucide-react"
+import { signOut } from "next-auth/react"
 
 export default function RegistrationForm() {
   const [message, setMessage] = useState("")
@@ -59,6 +60,12 @@ export default function RegistrationForm() {
             <Link href="/">
               <Button>Return to Home</Button>
             </Link>
+            <Button className="ml-4"
+              variant="outline" 
+              onClick={() => signOut({ callbackUrl: "/" })}
+            >
+              Sign Out
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -94,12 +101,22 @@ export default function RegistrationForm() {
     }
   }
 
-  return (
-    <Card className="w-full max-w-2xl mx-auto">
-      <CardHeader>
-        <CardTitle>Register for Robocupido 2025</CardTitle>
-        <CardDescription>Fill out the form below to find your perfect Valentine's match!</CardDescription>
-      </CardHeader>
+    return (
+      <Card className="w-full max-w-2xl mx-auto">
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <div>
+              <CardTitle>Register for Robocupido 2025</CardTitle>
+              <CardDescription>Fill out the form below to find your perfect Valentine's match!</CardDescription>
+            </div>
+            <Button 
+              variant="outline" 
+              onClick={() => signOut({ callbackUrl: "/" })}
+            >
+              Sign Out
+            </Button>
+          </div>
+        </CardHeader>
       <CardContent>
         <form action={handleSubmit}>
           <div className="grid w-full items-center gap-6">
