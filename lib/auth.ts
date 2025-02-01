@@ -12,6 +12,11 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
+    async signIn({ user, profile }) {
+      // Check if email is verified and ends with @tec.mx
+      const isAllowed = user?.email?.endsWith("@tec.mx") && profile?.email_verified;
+      return isAllowed;
+    },
     session: async ({ session, user }) => {
       if (session?.user) {
         session.user.id = user.id
@@ -21,5 +26,6 @@ export const authOptions: NextAuthOptions = {
   },
   pages: {
     signIn: "/login",
+    error: "/login",
   },
 }

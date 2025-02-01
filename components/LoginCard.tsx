@@ -2,10 +2,14 @@
 
 import { signIn } from "next-auth/react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Heart } from "lucide-react"
 
 export default function LoginCard() {
+  const searchParams = useSearchParams()
+  const error = searchParams.get("error")
+  
   return (
     <Card className="w-full max-w-md">
       <CardHeader className="text-center">
@@ -14,6 +18,11 @@ export default function LoginCard() {
         <CardDescription>Sign in to find your perfect Valentine's match!</CardDescription>
       </CardHeader>
       <CardContent>
+        {error === "AccessDenied" && (
+          <p className="text-red-500 text-center mb-4">
+            Only @tec.mx email addresses are allowed.
+          </p>
+        )}
         <Button 
           onClick={() => signIn("google", { callbackUrl: "/register" })}
           className="w-full flex items-center justify-center gap-2 bg-white text-gray-800 hover:bg-gray-100 border border-gray-300"
