@@ -7,7 +7,7 @@ import { revalidatePath } from "next/cache"
 
 export async function registerUser(formData: FormData) {
   try {
-    const session = await getServerSession(authOptions)
+    const session: { user: { id: string; name?: string | null; email?: string | null; image?: string | null } } | null = await getServerSession(authOptions)
     
     if (!session?.user) {
       return { success: false, message: "You must be logged in to register" }

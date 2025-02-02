@@ -28,7 +28,7 @@ export default function RegistrationForm() {
   useEffect(() => {
     async function checkSubmissionStatus() {
       if (session?.user) {
-        const response = await fetch(`/api/profile/check?userId=${session.user.id}`)
+        const response = await fetch(`/api/profile/check?userId=${(session.user as { id: string }).id}`)
         const data = await response.json()
         setHasSubmitted(data.hasSubmitted)
       }
@@ -59,9 +59,9 @@ export default function RegistrationForm() {
       <Card className="w-full max-w-2xl mx-auto">
         <CardContent className="py-20">
           <div className="text-center">
-            <h2 className="text-2xl font-bold mb-4">You've Already Registered!</h2>
+            <h2 className="text-2xl font-bold mb-4">You&apos;ve Already Registered!</h2>
             <p className="text-gray-600 mb-6">
-              You have already submitted your registration form. We'll contact you with your match on February 14th!
+              You have already submitted your registration form. We&apos;ll contact you with your match on February 14th!
             </p>
             <Link href="/">
               <Button>Return to Home</Button>
@@ -100,7 +100,7 @@ export default function RegistrationForm() {
       } else {
         setMessage(result.message)
       }
-    } catch (error) {
+    } catch {
       setMessage("An error occurred. Please try again.")
     } finally {
       setIsSubmitting(false)
@@ -113,7 +113,7 @@ export default function RegistrationForm() {
           <div className="flex justify-between items-center">
             <div>
               <CardTitle>Register for Robocupido 2025</CardTitle>
-              <CardDescription>Fill out the form below to find your perfect Valentine's match!</CardDescription>
+              <CardDescription>Fill out the form below to find your perfect Valentine&apos;s match!</CardDescription>
             </div>
             <Button 
               variant="outline" 
@@ -203,7 +203,7 @@ export default function RegistrationForm() {
               </RadioGroup>
             </div>
             <div className="flex flex-col space-y-1.5">
-              <Label>Ideal Valentine's Day (select all that apply)</Label>
+              <Label>Ideal Valentine&apos;s Day (select all that apply)</Label>
               <div className="grid grid-cols-2 gap-2">
                 <div className="flex items-center space-x-2">
                   <Checkbox id="romantic-dinner" name="valentines_day_preference" value="romantic-dinner" />

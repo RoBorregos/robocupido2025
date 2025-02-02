@@ -13,7 +13,7 @@ export default function LandingSection() {
       <Heart className="w-24 h-24 text-red-500 mx-auto mb-8 animate-heartbeat" />
       <h1 className="text-5xl md:text-6xl font-bold text-red-600 mb-6">Robocupido 2025</h1>
       <p className="text-xl md:text-2xl text-gray-700 mb-12 max-w-2xl mx-auto">
-        Find your perfect match for Valentine's Day! Our AI-powered matchmaking system will pair you with your ideal
+        Find your perfect match for Valentine&apos;s Day! Our AI-powered matchmaking system will pair you with your ideal
         partner. Register now and get matched on February 14th.
       </p>
       <Link href={session ? "/register" : "/login"}>

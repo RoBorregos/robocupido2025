@@ -5,24 +5,35 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Heart } from "lucide-react"
+import { Suspense } from "react"
 
-export default function LoginCard() {
+function LoginError() {
   const searchParams = useSearchParams()
   const error = searchParams.get("error")
-  
+
+  if (error === "AccessDenied") {
+    return (
+      <p className="text-red-500 text-center mb-4">
+        Only @tec.mx email addresses are allowed.
+      </p>
+    )
+  }
+
+  return null
+}
+
+export default function LoginCard() {
   return (
     <Card className="w-full max-w-md">
       <CardHeader className="text-center">
         <Heart className="w-12 h-12 text-red-500 mx-auto mb-4 animate-pulse" />
         <CardTitle className="text-2xl text-red-600">Welcome to RoboCupido</CardTitle>
-        <CardDescription>Sign in to find your perfect Valentine's match!</CardDescription>
+        <CardDescription>Sign in to find your perfect Valentine&apos;s match!</CardDescription>
       </CardHeader>
       <CardContent>
-        {error === "AccessDenied" && (
-          <p className="text-red-500 text-center mb-4">
-            Only @tec.mx email addresses are allowed.
-          </p>
-        )}
+        <Suspense fallback={null}>
+          <LoginError />
+        </Suspense>
         <Button 
           onClick={() => signIn("google", { callbackUrl: "/register" })}
           className="w-full flex items-center justify-center gap-2 bg-white text-gray-800 hover:bg-gray-100 border border-gray-300"
