@@ -1,64 +1,115 @@
+// app/actions.ts
 "use server"
 
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import clientPromise from "@/lib/mongodb"
-import { revalidatePath } from "next/cache"
 
 export async function registerUser(formData: FormData) {
   try {
-    const session: { user: { id: string; name?: string | null; email?: string | null; image?: string | null } } | null = await getServerSession(authOptions)
-    
+    const session = await getServerSession(authOptions)
     if (!session?.user) {
-      return { success: false, message: "You must be logged in to register" }
+      return { success: false, message: "Debes iniciar sesión para enviar el formulario." }
     }
 
     const client = await clientPromise
     const db = client.db("robocupido")
-    
-    // Check if user has already submitted a form
-    const existingProfile = await db.collection("profiles").findOne({
-      userId: session.user.id
-    })
+    const submissions = db.collection("submissions")
 
-    if (existingProfile) {
-      return { 
-        success: false, 
-        message: "You have already submitted a registration form" 
+    // Check if user has already submitted a form using the email
+    const existingSubmission = await submissions.findOne({ 
+      userEmail: session.user.email 
+    })
+    
+    if (existingSubmission) {
+      return { success: false, message: "Ya has enviado un formulario anteriormente." }
+    }
+
+    // Process form data with validation
+    const submissionData = {
+      userEmail: session.user.email,
+      userName: session.user.name,
+      fullName: formData.get("fullName"),
+      age: safeParseInt(formData.get("age") as string),
+      gender: formData.get("gender"),
+      phone: formData.get("phone"),
+      instagram: formData.get("instagram"),
+      description: formData.get("description"),
+      matchPreferences: formData.getAll("matchPreferences"),
+      lookingFor: formData.get("lookingFor"),
+      dateOlder: formData.get("dateOlder"),
+      dateYounger: formData.get("dateYounger"),
+      activities: formData.getAll("activities"),
+      socialPreference: safeParseInt(formData.get("socialPreference") as string),
+      hobbyTime: formData.get("hobbyTime"),
+      
+      // Importance ratings
+      honestyImportance: safeParseInt(formData.get("honestidadImportance") as string),
+      loyaltyImportance: safeParseInt(formData.get("lealtadImportance") as string),
+      kindnessImportance: safeParseInt(formData.get("bondadImportance") as string),
+      respectImportance: safeParseInt(formData.get("respetoImportance") as string),
+      openMindednessImportance: safeParseInt(formData.get("apertura mentalImportance") as string),
+      independenceImportance: safeParseInt(formData.get("independenciaImportance") as string),
+      ambitionImportance: safeParseInt(formData.get("ambicionImportance") as string),
+      creativityImportance: safeParseInt(formData.get("creatividadImportance") as string),
+      humorImportance: safeParseInt(formData.get("humorImportance") as string),
+      authenticityImportance: safeParseInt(formData.get("autenticidadImportance") as string),
+      empathyImportance: safeParseInt(formData.get("empatiaImportance") as string),
+      
+      // Additional characteristics
+      closenessEase: safeParseInt(formData.get("closenessEase") as string),
+      conflictResolution: formData.get("conflictResolution"),
+      attentionToDetail: safeParseInt(formData.get("attentionToDetail") as string),
+      stressLevel: safeParseInt(formData.get("stressLevel") as string),
+      imagination: safeParseInt(formData.get("imagination") as string),
+      shareDetailedInfo: formData.get("shareDetailedInfo"),
+      detailedDescription: formData.get("detailedDescription"),
+      attractiveTraits: formData.get("attractiveTraits"),
+      
+      // Metadata
+      createdAt: new Date(),
+      lastUpdated: new Date()
+    }
+
+    // Validate required fields
+    const requiredFields = ['fullName', 'age', 'gender', 'phone']
+    for (const field of requiredFields) {
+      if (!submissionData[field as keyof typeof submissionData]) {
+        return { 
+          success: false, 
+          message: `El campo ${field} es requerido.` 
+        }
       }
     }
 
-    // Process form data
-    const profile = {
-      userId: session.user.id,
-      name: formData.get("name"),
-      email: formData.get("email"),
-      age: parseInt(formData.get("age") as string),
-      gender: formData.get("gender"),
-      seeking: formData.get("seeking"),
-      interests: (formData.get("interests") as string).split(",").map(i => i.trim()),
-      relationshipPreference: formData.get("relationship_preference"),
-      valentinesDayPreferences: formData.getAll("valentines_day_preference"),
-      loveLanguage: formData.get("love_language"),
-      aboutMe: formData.get("about_me"),
-      idealMatch: formData.get("ideal_match"),
-      hasSubmittedForm: true,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    }
+    // // Validate age
+    // if (submissionData.age === null || submissionData.age < 18 || submissionData.age > 100) {
+    //   return { 
+    //     success: false, 
+    //     message: "La edad debe estar entre 18 y 100 años." 
+    //   }
+    // }
 
-    await db.collection("profiles").insertOne(profile)
-    
-    revalidatePath("/register")
+    // Insert the submission into the database
+    await submissions.insertOne(submissionData)
+
     return { 
       success: true, 
-      message: "Registration successful! We'll contact you with your match on February 14th." 
+      message: "¡Registro exitoso! Te contactaremos con tu pareja el 14 de febrero." 
     }
+
   } catch (error) {
-    console.error("Registration error:", error)
+    console.error("Error in registerUser:", error)
     return { 
       success: false, 
-      message: "An error occurred during registration. Please try again." 
+      message: "Ocurrió un error al procesar tu registro. Por favor intenta nuevamente." 
     }
   }
+}
+
+// Helper function to safely parse integers
+function safeParseInt(value: string | null | undefined): number | null {
+  if (!value) return null
+  const parsed = parseInt(value)
+  return isNaN(parsed) ? null : parsed
 }

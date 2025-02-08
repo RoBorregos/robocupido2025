@@ -14,7 +14,11 @@
     "@radix-ui/react-label": "^2.1.1",
     "@radix-ui/react-radio-group": "^1.2.2",
     "@radix-ui/react-select": "^2.1.5",
+    "@radix-ui/react-slider": "^1.2.3",
     "@radix-ui/react-slot": "^1.1.1",
+    "@tsparticles/react": "^3.0.0",
+    "@tsparticles/shape-heart": "^3.8.1",
+    "@tsparticles/slim": "^3.8.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.474.0",
@@ -24,10 +28,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tailwind-merge": "^3.0.1",
-    "tailwindcss-animate": "^1.0.7",
-    "@tsparticles/react": "^3.0.0",
-    "@tsparticles/shape-heart": "^3.8.1",
-    "@tsparticles/slim": "^3.8.1"
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

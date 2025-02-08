@@ -1,3 +1,4 @@
+// app/api/profile/check/route.ts
 import { NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
@@ -9,17 +10,17 @@ export async function GET(request: Request) {
     
     if (!session?.user) {
       return NextResponse.json(
-        { error: "Unauthorized" },
+        { error: "No autorizado" },
         { status: 401 }
       )
     }
 
     const { searchParams } = new URL(request.url)
-    const userId = searchParams.get("userId")
+    const email = searchParams.get("email")
 
-    if (!userId) {
+    if (!email) {
       return NextResponse.json(
-        { error: "User ID is required" },
+        { error: "Email es requerido" },
         { status: 400 }
       )
     }
@@ -27,16 +28,18 @@ export async function GET(request: Request) {
     const client = await clientPromise
     const db = client.db("robocupido")
     
-    const profile = await db.collection("profiles").findOne({ userId })
+    const submission = await db.collection("submissions").findOne({ 
+      userEmail: email 
+    })
     
     return NextResponse.json({ 
-      hasSubmitted: !!profile 
+      hasSubmitted: !!submission 
     })
     
   } catch (error) {
-    console.error("Profile check error:", error)
+    console.error("Error checking profile:", error)
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Error interno del servidor" },
       { status: 500 }
     )
   }
