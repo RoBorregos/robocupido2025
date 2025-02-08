@@ -4,6 +4,9 @@
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import clientPromise from "@/lib/mongodb"
+import * as tf from '@tensorflow/tfjs-node';
+import { AutoTokenizer, AutoModel } from '@huggingface/transformers';
+
 
 export async function registerUser(formData: FormData) {
   try {
@@ -82,6 +85,24 @@ export async function registerUser(formData: FormData) {
       }
     }
 
+// Generate embeddings for text fields
+const embeddings: { [key: string]: number[] } = {};
+const textFields = [
+  'fullName', 'description', 'instagram', 'lookingFor', 'dateOlder', 
+  'dateYounger', 'hobbyTime', 'conflictResolution', 'shareDetailedInfo', 
+  'detailedDescription', 'attractiveTraits'
+];
+
+for (const field of textFields) {
+  const text = submissionData[field as keyof typeof submissionData];
+  if (typeof text === "string" && text.trim() !== "") {
+    embeddings[`${field}Embedding`] = await generateEmbeddings(text);
+  }
+}
+
+// Combine original submission data and generated embeddings
+const dataWithEmbeddings = { ...submissionData, embeddings };
+
     // // Validate age
     // if (submissionData.age === null || submissionData.age < 18 || submissionData.age > 100) {
     //   return { 
@@ -91,7 +112,10 @@ export async function registerUser(formData: FormData) {
     // }
 
     // Insert the submission into the database
-    await submissions.insertOne(submissionData)
+    await submissions.insertOne({
+      submissionData,
+      dataWithEmbeddings
+  });
 
     return { 
       success: true, 
@@ -105,6 +129,17 @@ export async function registerUser(formData: FormData) {
       message: "Ocurrió un error al procesar tu registro. Por favor intenta nuevamente." 
     }
   }
+}
+
+// Helper function to generate text embeddings
+async function generateEmbeddings(text: string) {
+  const tokenizer = await AutoTokenizer.fromPretrained('bert-base-uncased');
+  const model = await AutoModel.fromPretrained('bert-base-uncased');
+  const inputs = await tokenizer.encode(text, { addSpecialTokens: true, truncation: true, padding: 'max_length' });
+  const inputTensor = tf.tensor(inputs.input_ids);
+  const output = await model.forward(inputTensor);
+  const embedding = output.last_hidden_state.mean(1).dataSync();
+  return embedding;
 }
 
 // Helper function to safely parse integers
