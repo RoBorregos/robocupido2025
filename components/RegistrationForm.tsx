@@ -61,7 +61,7 @@ export default function RegistrationForm() {
           <div className="text-center">
             <h2 className="text-2xl font-bold mb-4">You&apos;ve Already Registered!</h2>
             <p className="text-gray-600 mb-6">
-              You have already submitted your registration form. We&apos;ll contact you with your match on February 14th!
+            You have already submitted your registration form. The results will be available on your account dashboard on February 14th!
             </p>
             <Link href="/">
               <Button>Return to Home</Button>
