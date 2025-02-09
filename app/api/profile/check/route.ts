@@ -28,7 +28,7 @@ export async function GET(request: Request) {
     const client = await clientPromise
     const db = client.db("robocupido")
     
-    const submission = await db.collection("submissions").findOne({ 
+    const submission = await db.collection("profiles").findOne({ 
       userEmail: email 
     })
     

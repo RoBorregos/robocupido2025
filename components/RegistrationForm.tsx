@@ -202,21 +202,21 @@ export default function RegistrationForm() {
               </div>
             </div>
             <div className="flex flex-col space-y-1.5">
-              <Label>¿Qué estás buscando?</Label>
-              <RadioGroup name="lookingFor" defaultValue="pareja">
+              <Label>¿Qué estás buscando? (Puedes seleccionar múltiples opciones)</Label>
+              <div className="grid grid-cols-2 gap-2">
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="pareja" id="looking-for-partner" />
+                  <Checkbox id="looking-for-partner" name="lookingFor" value="pareja" />
                   <Label htmlFor="looking-for-partner">Pareja</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="amistad" id="looking-for-friendship" />
+                  <Checkbox id="looking-for-friendship" name="lookingFor" value="amistad" />
                   <Label htmlFor="looking-for-friendship">Amistad</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="casual" id="looking-for-casual" />
+                  <Checkbox id="looking-for-casual" name="lookingFor" value="casual" />
                   <Label htmlFor="looking-for-casual">Algo casual</Label>
                 </div>
-              </RadioGroup>
+              </div>
             </div>
             <div className="flex flex-col space-y-1.5">
               <Label>¿Saldrías con alguien mayor que tú?</Label>
