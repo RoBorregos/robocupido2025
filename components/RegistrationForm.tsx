@@ -320,11 +320,11 @@ export default function RegistrationForm() {
                   "Respeto",
                   "Apertura Mental",
                   "Independencia",
-                  "Ambición",
+                  "Ambicion",
                   "Creatividad",
                   "Humor",
                   "Autenticidad",
-                  "Empatía",
+                  "Empatia",
                 ].map((value) => (
                   <div key={value}>
                     <Label>{value}</Label>
