@@ -13,8 +13,8 @@ const Welcome = () => {
     const { data: session } = useSession()
     return ( 
         // El cuadro que anda ahi
-        <div className="flex items-center justify-center min-h-screen bg-center">
-            <div className="max-w-4xl w-full rounded-lg flex overflow-hidden bg-center mx-auto">
+        <div className="flex items-center justify-center min-h-screen bg-center ">
+            <div className="max-w-4xl w-full rounded-lg flex flex-col lg:flex-row overflow-hidden bg-center mx-auto items-center justify-center">
                 {/* Seccion izquierda con el logo */}
                 <div className="w-1/2 flex flex-col items-center justify-center p-6">
                     <Image
