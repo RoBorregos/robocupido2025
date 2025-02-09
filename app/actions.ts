@@ -5,6 +5,30 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import clientPromise from "@/lib/mongodb"
 import { ObjectId } from "mongodb"
+import OpenAI from 'openai'
+
+// Initialize OpenAI client
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+})
+
+// Function to generate embeddings for text
+async function generateEmbedding(text: string | null): Promise<number[] | null> {
+  if (!text) return null
+  
+  try {
+    const response = await openai.embeddings.create({
+      model: "text-embedding-3-small",
+      input: text,
+      encoding_format: "float"
+    })
+    console.log(response.data[0].embedding)
+    return response.data[0].embedding
+  } catch (error) {
+    console.error("Error generating embedding:", error)
+    return null
+  }
+}
 
 export async function registerUser(formData: FormData) {
   try {
@@ -17,6 +41,7 @@ export async function registerUser(formData: FormData) {
     const db = client.db("robocupido")
     const profiles = db.collection("profiles")
     const preferences = db.collection("preferences")
+    const textEmbeddings = db.collection("text_embeddings")
 
     // Check if user has already submitted a form using the email
     const existingSubmission = await profiles.findOne({ 
@@ -30,7 +55,6 @@ export async function registerUser(formData: FormData) {
     // Generate a unique ID to link the documents
     const profileId = new ObjectId()
 
-    // Split data into two objects
     const profileData = {
       _id: profileId,
       userEmail: session.user.email,
@@ -44,17 +68,21 @@ export async function registerUser(formData: FormData) {
       lastUpdated: new Date()
     }
 
+    // Get text fields that need embeddings
+    const description = formData.get("description") as string
+    const detailedDescription = formData.get("detailedDescription") as string
+    const attractiveTraits = formData.get("attractiveTraits") as string
+
     const preferencesData = {
       profileId: profileId,
-      description: formData.get("description"),
+      description,
       matchPreferences: formData.getAll("matchPreferences"),
-      lookingFor: formData.getAll("lookingFor"),
+      lookingFor: formData.get("lookingFor"),
       dateOlder: formData.get("dateOlder"),
       dateYounger: formData.get("dateYounger"),
       activities: formData.getAll("activities"),
       socialPreference: safeParseInt(formData.get("socialPreference") as string),
       hobbyTime: formData.get("hobbyTime"),
-      // Importance ratings
       honestyImportance: safeParseInt(formData.get("honestidadImportance") as string),
       loyaltyImportance: safeParseInt(formData.get("lealtadImportance") as string),
       kindnessImportance: safeParseInt(formData.get("bondadImportance") as string),
@@ -66,15 +94,26 @@ export async function registerUser(formData: FormData) {
       humorImportance: safeParseInt(formData.get("humorImportance") as string),
       authenticityImportance: safeParseInt(formData.get("autenticidadImportance") as string),
       empathyImportance: safeParseInt(formData.get("empatiaImportance") as string),
-      // Additional characteristics
       closenessEase: safeParseInt(formData.get("closenessEase") as string),
       conflictResolution: formData.get("conflictResolution"),
       attentionToDetail: safeParseInt(formData.get("attentionToDetail") as string),
       stressLevel: safeParseInt(formData.get("stressLevel") as string),
       imagination: safeParseInt(formData.get("imagination") as string),
       shareDetailedInfo: formData.get("shareDetailedInfo"),
-      detailedDescription: formData.get("detailedDescription"),
-      attractiveTraits: formData.get("attractiveTraits"),
+      detailedDescription,
+      attractiveTraits,
+      createdAt: new Date(),
+      lastUpdated: new Date()
+    }
+
+    // Generate embeddings only for the specified text fields
+    const embeddingsData = {
+      profileId: profileId,
+      textEmbeddings: {
+        description: await generateEmbedding(description),
+        detailedDescription: await generateEmbedding(detailedDescription),
+        attractiveTraits: await generateEmbedding(attractiveTraits)
+      },
       createdAt: new Date(),
       lastUpdated: new Date()
     }
@@ -90,15 +129,16 @@ export async function registerUser(formData: FormData) {
       }
     }
 
-    // Insert both documents in a transaction
-    const dbSession = client.startSession()
+    // Insert all documents in a transaction
+    const mongoSession = client.startSession()
     try {
-      await dbSession.withTransaction(async () => {
-        await profiles.insertOne(profileData, { session: dbSession })
-        await preferences.insertOne(preferencesData, { session: dbSession })
+      await mongoSession.withTransaction(async () => {
+        await profiles.insertOne(profileData, { session: mongoSession })
+        await preferences.insertOne(preferencesData, { session: mongoSession })
+        await textEmbeddings.insertOne(embeddingsData, { session: mongoSession })
       })
     } finally {
-      await dbSession.endSession()
+      await mongoSession.endSession()
     }
 
     return { 

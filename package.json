@@ -25,6 +25,7 @@
     "mongodb": "^6.13.0",
     "next": "15.1.6",
     "next-auth": "^4.24.11",
+    "openai": "^4.83.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tailwind-merge": "^3.0.1",
