@@ -1,10 +1,9 @@
 "use client"
 
-import { Tangerine } from "next/font/google";
-import Image from 'next/image';
+import { Tangerine } from "next/font/google"
+import Image from 'next/image'
 import { useState } from "react"
-import Link from 'next/link';
-import styles from './/font.module.css';
+import styles from './/font.module.css'
 import { useSession } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { PrivacyPopup } from "./PrivacyPopup"
