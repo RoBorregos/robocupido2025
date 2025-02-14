@@ -93,7 +93,7 @@ export default function RegistrationForm() {
           <div className="text-center">
             <h2 className="text-2xl font-bold mb-4">¡Ya has enviado tu formulario!</h2>
             <p className="text-gray-600 mb-6">
-              Tu registro ya está completo. Inicia sesion con tu cuenta el 14 de febrero para descubrir tus matchs!
+              Tu registro ya está completo. Inicia sesion con tu cuenta el 15 de febrero para descubrir tus matchs!
             </p>
             <div className="flex flex-col gap-4 items-center">
               <Link href="/">
