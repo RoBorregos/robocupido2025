@@ -1,10 +1,9 @@
 import { Inter } from "next/font/google"
 import Providers from "@/components/Providers"
 import "@/styles/globals.css"
+import Header from "@/components/header"
 
 const inter = Inter({ subsets: ["latin"] })
-
-import NavBar from "@/components/navbar";
 
 export const metadata = {
   title: "RoboCupido 2025",
@@ -20,6 +19,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <Providers>{children}</Providers>
+        <Header/>
       </body>
     </html>
   )
