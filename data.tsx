@@ -1,4 +1,17 @@
-import { HomeIcon, BarChart } from "lucide-react";
+import { HomeIcon, BarChart, Instagram, Globe} from "lucide-react";
+
+export const socialNetworks = [
+    {
+        id: 1,
+        logo: <Instagram size={30} strokeWidth={1} />,
+        src: "https://www.instagram.com/roborregos/",
+    },
+    {
+        id: 2,
+        logo: <Globe size={30} strokeWidth={1} />,
+        src: "https://roborregos.com/",
+    }
+];
 
 
 export const itemsNavbar = [
