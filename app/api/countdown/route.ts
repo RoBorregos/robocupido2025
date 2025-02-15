@@ -1,31 +1,19 @@
 import { NextResponse } from "next/server"
 
 export async function GET() {
+  // Create dates using Monterrey's timezone (UTC-6)
   const now = new Date()
-  const currentHour = now.getHours()
-  const currentMinute = now.getMinutes()
+  
+  // Create target time at 4 PM Monterrey time
+  const targetTime = new Date()
+  targetTime.setHours(16, 0, 0, 0) // Set to 4 PM
 
-  // Calculate the next hour and a half
-  let endHour = currentHour + 1
-  let endMinute = currentMinute + 30
-
-  if (endMinute >= 60) {
-    endHour += 1
-    endMinute -= 60
+  // If current time is past 4 PM, set target to tomorrow 4 PM
+  if (now >= targetTime) {
+    targetTime.setDate(targetTime.getDate() + 1)
   }
 
-  if (endHour >= 24) {
-    endHour -= 24
-  }
-
-  const endTime = new Date(now)
-  endTime.setHours(endHour, endMinute, 0, 0)
-
-  // If the end time is earlier than now, add a day
-  if (endTime <= now) {
-    endTime.setDate(endTime.getDate() + 1)
-  }
-
-  return NextResponse.json({ endTime: endTime.getTime() })
+  return NextResponse.json({ 
+endTime: targetTime.getTime(),
+  })
 }
-
