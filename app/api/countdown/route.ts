@@ -5,7 +5,7 @@ export async function GET() {
   const now = new Date();
 
   // Create target time at 4 PM Monterrey time (16:00 + 6 hours)
-  const targetTime = new Date("2025-02-15T23:00:00Z");
+  const targetTime = new Date("2025-02-16T06:00:00Z");
 
   // If current time is past 4 PM, set target to tomorrow 4 PM
   if (now >= targetTime) {
