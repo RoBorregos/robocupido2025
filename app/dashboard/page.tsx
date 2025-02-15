@@ -2,10 +2,12 @@ import { Dashboard } from "@/components/Dashboard";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Heart } from "lucide-react";
+import { signOut } from "next-auth/react"
 
 // import { redirect } from "next/navigation";
 
 export default function DashboardPage() {
+  
   // redirect("/");
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-pink-100 to-red-100">
@@ -15,11 +17,12 @@ export default function DashboardPage() {
             href="/"
             className="flex items-center gap-2 text-2xl font-bold text-primary"
           >
-            <Heart className="w-6 h-6" />
             <span>Robocupido 2025</span>
           </Link>
           <nav>
-            <Button variant="outline">Cerrar Sesión</Button>
+            <Button onClick={() => signOut()} variant="outline">
+                      Cerrar Sesión
+                    </Button>
           </nav>
         </div>
       </header>
@@ -32,13 +35,6 @@ export default function DashboardPage() {
         <div className="container mx-auto px-4 py-6 text-center text-gray-600">
           <p>&copy; 2025 Robocupido. Todos los derechos reservados.</p>
           <div className="mt-2">
-            <Link href="/privacy" className="text-sm hover:underline">
-              Política de Privacidad
-            </Link>
-            {" | "}
-            <Link href="/terms" className="text-sm hover:underline">
-              Términos de Servicio
-            </Link>
           </div>
         </div>
       </footer>
