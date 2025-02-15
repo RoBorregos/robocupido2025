@@ -1,26 +1,28 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Progress } from "@/components/ui/progress"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import {
-  Heart,
-  Calendar,
-  Gift,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
   Music,
   Book,
   Film,
   Gamepad,
-  MapPin,
-  Briefcase,
-  GraduationCap,
+  // MapPin,
+  // Briefcase,
+  // GraduationCap,
   Cake,
-  Eye,
-} from "lucide-react"
-import type React from "react"
+} from "lucide-react";
+import type React from "react";
 
 // Enhanced mock data for demonstration
 const mockMatches = {
@@ -111,53 +113,49 @@ const mockMatches = {
       interests: ["Arte", "Yoga", "Lectura"],
     },
   ],
-}
+};
 
-const userStats = {
-  totalMatches: 42,
-  profileViews: 156,
-  upcomingDates: 2,
-}
-
-type MatchType = "pareja" | "amigos" | "casual"
+type MatchType = "pareja" | "amigos" | "casual";
 
 const InterestIcon = ({ interest }: { interest: string }) => {
   switch (interest.toLowerCase()) {
     case "música":
-      return <Music className="w-4 h-4" />
+      return <Music className="w-4 h-4" />;
     case "lectura":
-      return <Book className="w-4 h-4" />
+      return <Book className="w-4 h-4" />;
     case "cine":
-      return <Film className="w-4 h-4" />
+      return <Film className="w-4 h-4" />;
     case "videojuegos":
-      return <Gamepad className="w-4 h-4" />
+      return <Gamepad className="w-4 h-4" />;
     default:
-      return null
+      return null;
   }
-}
+};
 
-const MatchCard = ({ match, type }: { match: Partial<(typeof mockMatches.pareja)[0]>; type: MatchType }) => (
+const MatchCard = ({
+  match,
+  type,
+}: {
+  match: Partial<(typeof mockMatches.pareja)[0]>;
+  type: MatchType;
+}) => (
   <Card className="mb-6">
     <CardHeader className="flex flex-row items-start gap-6">
       <Avatar className="w-24 h-24">
-        <AvatarImage src={`https://api.dicebear.com/6.x/micah/svg?seed=${match.name}`} />
+        <AvatarImage
+          src={`https://api.dicebear.com/6.x/micah/svg?seed=${match.name}`}
+        />
         <AvatarFallback>
-          {match.name?.split(" ").map((n) => n[0]).join("")}
+          {match.name
+            ?.split(" ")
+            .map((n) => n[0])
+            .join("")}
         </AvatarFallback>
       </Avatar>
       <div className="flex-1">
         <CardTitle className="text-2xl mb-2">{match.name}</CardTitle>
         <CardDescription className="flex items-center gap-2">
           <Cake className="w-4 h-4" /> {match.age} años
-        </CardDescription>
-        <CardDescription className="flex items-center gap-2">
-          <MapPin className="w-4 h-4" /> {match.location}
-        </CardDescription>
-        <CardDescription className="flex items-center gap-2">
-          <Briefcase className="w-4 h-4" /> {match.occupation}
-        </CardDescription>
-        <CardDescription className="flex items-center gap-2">
-          <GraduationCap className="w-4 h-4" /> {match.education}
         </CardDescription>
       </div>
     </CardHeader>
@@ -174,7 +172,11 @@ const MatchCard = ({ match, type }: { match: Partial<(typeof mockMatches.pareja)
         <h4 className="font-semibold mb-2">Intereses</h4>
         <div className="flex flex-wrap gap-2">
           {match.interests?.map((interest, index) => (
-            <Badge key={index} variant="secondary" className="flex items-center gap-1">
+            <Badge
+              key={index}
+              variant="secondary"
+              className="flex items-center gap-1"
+            >
               <InterestIcon interest={interest} />
               {interest}
             </Badge>
@@ -182,18 +184,6 @@ const MatchCard = ({ match, type }: { match: Partial<(typeof mockMatches.pareja)
         </div>
       </div>
       <div className="grid grid-cols-2 gap-4 mb-4">
-        <div>
-          <p className="text-sm font-medium">Última actividad</p>
-          <p className="text-sm text-gray-600">{match.lastActive}</p>
-        </div>
-        <div>
-          <p className="text-sm font-medium">Vistas al perfil</p>
-          <p className="text-sm text-gray-600">{match.profileViews}</p>
-        </div>
-        <div>
-          <p className="text-sm font-medium">Amigos en común</p>
-          <p className="text-sm text-gray-600">{match.mutualFriends}</p>
-        </div>
         <div>
           <p className="text-sm font-medium">Tipo de match</p>
           <p className="text-sm text-gray-600 capitalize">{type}</p>
@@ -221,50 +211,57 @@ const MatchCard = ({ match, type }: { match: Partial<(typeof mockMatches.pareja)
         </Button>
         <Button size="sm" variant="outline" className="flex items-center gap-2">
           <svg
+            role="img"
             xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
             viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="w-4 h-4"
+            height={10}
+            focusable={false}
+            // {...props}
           >
-            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+            <path
+              fill="none"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M22 16.92v3a2 2 0 0 1-2.18 2a19.79 19.79 0 0 1-8.63-3.07a19.5 19.5 0 0 1-6-6a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72a12.84 12.84 0 0 0 .7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45a12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92"
+            />
           </svg>
-          Conectar
+          {match.whatsapp}
         </Button>
       </div>
     </CardContent>
   </Card>
-)
+);
 
-const StatCard = ({ icon, title, value }: { icon: React.ReactNode; title: string; value: number | string }) => (
-  <Card>
-    <CardContent className="flex items-center p-6">
-      <div className="text-4xl text-primary mr-4">{icon}</div>
-      <div>
-        <CardDescription>{title}</CardDescription>
-        <CardTitle className="text-2xl">{value}</CardTitle>
-      </div>
-    </CardContent>
-  </Card>
-)
+// const StatCard = ({
+//   icon,
+//   title,
+//   value,
+// }: {
+//   icon: React.ReactNode;
+//   title: string;
+//   value: number | string;
+// }) => (
+//   <Card>
+//     <CardContent className="flex items-center p-6">
+//       <div className="text-4xl text-primary mr-4">{icon}</div>
+//       <div>
+//         <CardDescription>{title}</CardDescription>
+//         <CardTitle className="text-2xl">{value}</CardTitle>
+//       </div>
+//     </CardContent>
+//   </Card>
+// );
 
 export function Dashboard() {
   // const [activeTab, setActiveTab] = useState<MatchType>("pareja")
-  
+
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6 text-center">Tus Matches de Robocupido 2025</h1>
-
-      <div className="grid gap-6 mb-8 md:grid-cols-3">
-        <StatCard icon={<Heart />} title="Total de Matches" value={userStats.totalMatches} />
-        <StatCard icon={<Eye />} title="Vistas a tu perfil" value={userStats.profileViews} />
-        <StatCard icon={<Calendar />} title="Citas Próximas" value={userStats.upcomingDates} />
-      </div>
+      <h1 className="text-3xl font-bold mb-6 text-center">
+        Tus Matches de Robocupido 2025
+      </h1>
 
       <Tabs defaultValue="pareja" className="w-full">
         <TabsList className="grid w-full grid-cols-3 mb-6">
@@ -282,26 +279,6 @@ export function Dashboard() {
           </TabsContent>
         ))}
       </Tabs>
-
-      <Card className="mt-8">
-        <CardHeader>
-          <CardTitle>Próximos Eventos</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ul className="space-y-2">
-            <li className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-primary" />
-              <span>Speed Dating Virtual - 15 de Febrero, 19:00</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <Gift className="w-4 h-4 text-primary" />
-              <span>Taller: Cómo Sorprender a tu Pareja - 20 de Febrero, 18:00</span>
-            </li>
-          </ul>
-        </CardContent>
-      </Card>
     </div>
-  )
+  );
 }
-
-    
