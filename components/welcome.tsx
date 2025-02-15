@@ -2,33 +2,31 @@
 
 import { Tangerine } from "next/font/google"
 import Image from 'next/image'
-import { useState } from "react"
+// import { useState } from "react"
 import styles from './/font.module.css'
-import { useSession } from "next-auth/react"
-import { Button } from "@/components/ui/button"
-import { PrivacyPopup } from "./PrivacyPopup"
-import { useRouter } from "next/navigation"
+// import { useSession } from "next-auth/react"
+// import { useRouter } from "next/navigation"
 import { CountdownTimer } from "./CountdownTimer"
 
 const tangerine = Tangerine({ subsets: ["latin"], weight: ["400", "700"] });
 
 const Welcome = () => {
-    const { data: session } = useSession()
-    const [isPrivacyPopupOpen, setIsPrivacyPopupOpen] = useState(false)
-    const router = useRouter()
+//     const { data: session } = useSession()  
+//     // const [isPrivacyPopupOpen, setIsPrivacyPopupOpen] = useState(false)
+//     const router = useRouter()
 
-  const handleRegisterClick = () => {
-    if (!session) {
-      setIsPrivacyPopupOpen(true)
-      return
-    }else{
-        router.push("/register")
-    }
-  }
+// //   const handleRegisterClick = () => {
+// //     if (!session) {
+// //       setIsPrivacyPopupOpen(true)
+// //       return
+// //     }else{
+// //         router.push("/register")
+// //     }
+// //   }
 
-  const handleClosePrivacyPopup = () => {
-    setIsPrivacyPopupOpen(false)
-  }
+// //   const handleClosePrivacyPopup = () => {
+// //     setIsPrivacyPopupOpen(false)
+// //   }
     return ( 
         // El cuadro que anda ahi
         <div className="flex items-center justify-center min-h-screen bg-center ">

@@ -1,4 +1,4 @@
-import RegistrationForm from "@/components/RegistrationForm"
+
 import { redirect } from "next/navigation"
 
 export default function RegisterPage() {

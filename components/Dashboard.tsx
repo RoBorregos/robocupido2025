@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -137,16 +136,13 @@ const InterestIcon = ({ interest }: { interest: string }) => {
   }
 }
 
-const MatchCard = ({ match, type }: { match: (typeof mockMatches.pareja)[0]; type: MatchType }) => (
+const MatchCard = ({ match, type }: { match: Partial<(typeof mockMatches.pareja)[0]>; type: MatchType }) => (
   <Card className="mb-6">
     <CardHeader className="flex flex-row items-start gap-6">
       <Avatar className="w-24 h-24">
         <AvatarImage src={`https://api.dicebear.com/6.x/micah/svg?seed=${match.name}`} />
         <AvatarFallback>
-          {match.name
-            .split(" ")
-            .map((n) => n[0])
-            .join("")}
+          {match.name?.split(" ").map((n) => n[0]).join("")}
         </AvatarFallback>
       </Avatar>
       <div className="flex-1">
@@ -177,7 +173,7 @@ const MatchCard = ({ match, type }: { match: (typeof mockMatches.pareja)[0]; typ
       <div className="mb-4">
         <h4 className="font-semibold mb-2">Intereses</h4>
         <div className="flex flex-wrap gap-2">
-          {match.interests.map((interest, index) => (
+          {match.interests?.map((interest, index) => (
             <Badge key={index} variant="secondary" className="flex items-center gap-1">
               <InterestIcon interest={interest} />
               {interest}
@@ -258,8 +254,8 @@ const StatCard = ({ icon, title, value }: { icon: React.ReactNode; title: string
 )
 
 export function Dashboard() {
-  const [activeTab, setActiveTab] = useState<MatchType>("pareja")
-
+  // const [activeTab, setActiveTab] = useState<MatchType>("pareja")
+  
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6 text-center">Tus Matches de Robocupido 2025</h1>
@@ -270,19 +266,7 @@ export function Dashboard() {
         <StatCard icon={<Calendar />} title="Citas Próximas" value={userStats.upcomingDates} />
       </div>
 
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle>Consejo del Día</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-gray-600">
-            "La clave para una conexión genuina es la autenticidad. Sé tú mismo y deja que tu personalidad brille en
-            cada interacción."
-          </p>
-        </CardContent>
-      </Card>
-
-      <Tabs defaultValue="pareja" className="w-full" onValueChange={(value) => setActiveTab(value as MatchType)}>
+      <Tabs defaultValue="pareja" className="w-full">
         <TabsList className="grid w-full grid-cols-3 mb-6">
           <TabsTrigger value="pareja">Pareja</TabsTrigger>
           <TabsTrigger value="amigos">Amigos</TabsTrigger>
