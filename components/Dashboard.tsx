@@ -116,7 +116,7 @@ import { getMatches } from "@/app/actions";
       <CardHeader className="flex flex-row items-start gap-6">
         <Avatar className="w-24 h-24">
           <AvatarImage
-            src={`https://api.dicebear.com/6.x/micah/svg?seed=${match.name}`}
+            src={`https://api.dicebear.com/7.x/initials/svg?seed=${match.name}`}
           />
           <AvatarFallback>
             {match.name
@@ -129,7 +129,9 @@ import { getMatches } from "@/app/actions";
           <CardTitle className="text-2xl mb-2">{match.name}</CardTitle>
           <CardDescription className="flex items-center gap-2">
             <Cake className="w-4 h-4" /> {match.age} años
+            <Badge variant="outline">{match.gender}</Badge>
           </CardDescription>
+
         </div>
       </CardHeader>
       <CardContent>

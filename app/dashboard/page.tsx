@@ -1,7 +1,7 @@
+'use client'
 import { Dashboard } from "@/components/Dashboard";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Heart } from "lucide-react";
 import { signOut } from "next-auth/react"
 
 // import { redirect } from "next/navigation";
@@ -21,8 +21,8 @@ export default function DashboardPage() {
           </Link>
           <nav>
             <Button onClick={() => signOut()} variant="outline">
-                      Cerrar Sesión
-                    </Button>
+             Cerrar Sesión
+            </Button>
           </nav>
         </div>
       </header>
