@@ -8,6 +8,7 @@ import { useSession } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { PrivacyPopup } from "./PrivacyPopup"
 import { useRouter } from "next/navigation"
+import { CountdownTimer } from "./CountdownTimer"
 
 const tangerine = Tangerine({ subsets: ["latin"], weight: ["400", "700"] });
 
@@ -51,12 +52,13 @@ const Welcome = () => {
                     <p className="text-gray-700 text-md mt-2 relative text-center">
                         Our AI-powered matchmaking system will pair you with your ideal partner.
                     </p>
-                    <p className="text-gray-800 text-md font-semibold mt-6 relative text-center">Register now and get matched on February 15th!</p>
+                    {/* <p className="text-gray-800 text-md font-semibold mt-6 relative text-center">Register now and get matched on February 15th!</p>
                     
                     <Button size="lg" className="text-lg px-8 py-6" onClick={handleRegisterClick}>
                         Register Now!
                     </Button>
-                <PrivacyPopup isOpen={isPrivacyPopupOpen} onClose={handleClosePrivacyPopup} />
+                <PrivacyPopup isOpen={isPrivacyPopupOpen} onClose={handleClosePrivacyPopup} /> */}
+                <CountdownTimer />
                 </div>
             </div>
         </div>
