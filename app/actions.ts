@@ -161,3 +161,86 @@ function safeParseInt(value: string | null | undefined): number | null {
   const parsed = parseInt(value)
   return isNaN(parsed) ? null : parsed
 }
+
+
+interface Match {
+  name: string;
+  age: number;
+  compatibility: number;
+  interests: string[];
+  instagram: string;
+  whatsapp: string;
+}
+
+interface MatchResponse {
+  pareja: Match[];
+  amigos: Match[];
+  casual: Match[];
+}
+
+export async function getMatches(userId: string): Promise<MatchResponse> {
+  try {
+    const client = await clientPromise;
+    const db = client.db("robocupido");
+    const matchesCollection = db.collection("match_test");
+    const profilesCollection = db.collection("profiles");
+    const preferencesCollection = db.collection("preferences");
+
+    // Find the user's matches
+    const userMatches = await matchesCollection.findOne({
+      profileId: new ObjectId(userId)
+    });
+
+    if (!userMatches) {
+      return { pareja: [], amigos: [], casual: [] };
+    }
+
+
+
+    // Helper function to fetch and format profile data
+    async function getProfileData(matchId: ObjectId, score: number): Promise<Match> {
+      const profile = await profilesCollection.findOne({ _id: matchId });
+      const preferences = await preferencesCollection.findOne({ profileId: matchId });
+      
+      return {
+        name: profile?.fullName as string,
+        age: profile?.age as number,
+        compatibility: score,
+        interests: preferences?.activities as string[] || [],
+        instagram: profile?.instagram as string,
+        whatsapp: profile?.phone as string
+      };
+    }
+
+    // Process pareja matches
+    const parejaMatches = await Promise.all(
+      (userMatches.pareja || []).map(async (match: { id: ObjectId; score: number }) => 
+        getProfileData(match.id, match.score)
+      )
+    );
+
+    // Process amigos matches
+    const amigosMatches = await Promise.all(
+      (userMatches.amigos || []).map(async (match: { id: ObjectId; score: number }) => 
+        getProfileData(match.id, match.score)
+      )
+    );
+
+    // Process casual matches
+    const casualMatches = await Promise.all(
+      (userMatches.casual || []).map(async (match: { id: ObjectId; score: number }) => 
+        getProfileData(match.id, match.score)
+      )
+    );
+
+    return {
+      pareja: parejaMatches,
+      amigos: amigosMatches,
+      casual: casualMatches
+    };
+
+  } catch (error) {
+    console.error("Error fetching matches:", error);
+    throw error;
+  }
+}

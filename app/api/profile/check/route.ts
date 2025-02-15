@@ -33,7 +33,8 @@ export async function GET(request: Request) {
     })
     
     return NextResponse.json({ 
-      hasSubmitted: !!submission 
+      hasSubmitted: !!submission,
+      profileId: submission ? submission._id.toString() : null
     })
     
   } catch (error) {
