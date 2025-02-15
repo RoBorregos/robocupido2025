@@ -46,7 +46,7 @@ export function CountdownTimer() {
   const seconds = timeLeft % 60;
 
   return (
-    <Card className="w-full max-w-md mx-auto">
+    <Card className="w-full max-w-md mx-auto transform transition-transform duration-300 hover:scale-105 shadow-pink-400">
       <CardHeader>
         <CardTitle className="text-lg md:text-2xl text-center">
           Resultados disponibles en
