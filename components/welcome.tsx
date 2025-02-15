@@ -51,7 +51,7 @@ const Welcome = () => {
                     <p className="text-gray-700 text-md mt-2 relative text-center">
                         Our AI-powered matchmaking system will pair you with your ideal partner.
                     </p>
-                    <p className="text-gray-800 text-md font-semibold mt-6 relative text-center">Register now and get matched on February 14th!</p>
+                    <p className="text-gray-800 text-md font-semibold mt-6 relative text-center">Register now and get matched on February 15th!</p>
                     
                     <Button size="lg" className="text-lg px-8 py-6" onClick={handleRegisterClick}>
                         Register Now!
