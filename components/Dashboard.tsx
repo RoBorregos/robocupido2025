@@ -7,6 +7,7 @@
     CardHeader,
     CardTitle,
   } from "@/components/ui/card";
+  import { MatchResponse } from "@/app/actions";
   import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
   import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
   import { Progress } from "@/components/ui/progress";
@@ -206,50 +207,58 @@ import { getMatches } from "@/app/actions";
   );
 
   export function Dashboard() {
-   const router = useRouter()
-   const { data: session, status } = useSession()
-   const [user_id, setUserId] = useState(null)
+    const router = useRouter()
+    const { data: session, status } = useSession()
+    const [matches, setMatches] = useState<MatchResponse>({
+      pareja: [],
+      amigos: [],
+      casual: []
+    })
+    const [isLoading, setIsLoading] = useState(true)
+  
     useEffect(() => {
-        async function checkuserid() {
-          if (session?.user?.email) {
-            try {
-              const response = await fetch(`/api/profile/check?email=${session.user.email}`)
-              const data = await response.json()
-              setUserId(data.profileId)
-              const user_id = data.profileId
-              if (user_id) {
-                const matches = await getMatches(user_id);
-                console.log(matches)
-              }
-            } catch (error) {
-              console.error("Error checking userid:", error)
+      async function fetchUserMatches() {
+        if (session?.user?.email) {
+          try {
+            const response = await fetch(`/api/profile/check?email=${session.user.email}`)
+            const data = await response.json()
+            
+            if (data.profileId) {
+              const matchesData = await getMatches(data.profileId)
+              setMatches(matchesData)
             }
+          } catch (error) {
+            console.error("Error fetching matches:", error)
+          } finally {
+            setIsLoading(false)
           }
         }
-        
-        checkuserid()
-      }, [session])
-
+      }
       
-    if (status === "loading") {
-        return (
-          <Card className="w-full max-w-2xl mx-auto">
-            <CardContent className="flex items-center justify-center py-20">
-              <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
-            </CardContent>
-          </Card>
-        )
-      }
+      fetchUserMatches()
+    }, [session])
+  
+    if (status === "loading" || isLoading) {
+      return (
+        <Card className="w-full max-w-2xl mx-auto">
+          <CardContent className="flex items-center justify-center py-20">
+            <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
+          </CardContent>
+        </Card>
+      )
+    }
+  
     if (status === "unauthenticated") {
-        router.push("/login")
-        return null
-      }
+      router.push("/login")
+      return null
+    }
+  
     return (
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-6 text-center">
           Tus Matches de Robocupido 2025
         </h1>
-
+  
         <Tabs defaultValue="pareja" className="w-full">
           <TabsList className="grid w-full grid-cols-3 mb-6">
             <TabsTrigger value="pareja">Pareja</TabsTrigger>
@@ -258,14 +267,22 @@ import { getMatches } from "@/app/actions";
           </TabsList>
           {(["pareja", "amigos", "casual"] as const).map((type) => (
             <TabsContent key={type} value={type}>
-              <div className="grid gap-8 md:grid-cols-2">
-                {mockMatches[type].map((match, index) => (
-                  <MatchCard key={index} match={match} type={type} />
-                ))}
-              </div>
+              {matches[type].length === 0 ? (
+                <Card>
+                  <CardContent className="flex items-center justify-center py-8">
+                    <p className="text-gray-500">No hay matches disponibles</p>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="grid gap-8 md:grid-cols-2">
+                  {matches[type].map((match, index) => (
+                    <MatchCard key={index} match={match} type={type} />
+                  ))}
+                </div>
+              )}
             </TabsContent>
           ))}
         </Tabs>
       </div>
-    );
+    )
   }

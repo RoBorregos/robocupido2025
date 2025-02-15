@@ -172,7 +172,7 @@ interface Match {
   whatsapp: string;
 }
 
-interface MatchResponse {
+export interface MatchResponse {
   pareja: Match[];
   amigos: Match[];
   casual: Match[];
