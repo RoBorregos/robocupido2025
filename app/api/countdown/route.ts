@@ -6,7 +6,7 @@ export async function GET() {
   
   // Create target time at 4 PM Monterrey time
   const targetTime = new Date()
-  targetTime.setHours(19, 0, 0, 0) // Set to 4 PM
+  targetTime.setHours(0, 0, 0, 0) // Set to 4 PM
 
   // If current time is past 4 PM, set target to tomorrow 4 PM
   if (now >= targetTime) {
