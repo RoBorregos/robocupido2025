@@ -27,7 +27,7 @@ export default function LoginCard() {
     <Card className="w-full max-w-md">
       <CardHeader className="text-center">
         <Heart className="w-12 h-12 text-red-500 mx-auto mb-4 animate-pulse" />
-        <CardTitle className="text-2xl text-red-600">Welcome to RoboCupido</CardTitle>
+        <CardTitle className="text-2xl text-red-600">Welcome back to RoboCupido</CardTitle>
         <CardDescription>Sign in to find your perfect Valentine&apos;s match!</CardDescription>
       </CardHeader>
       <CardContent>
@@ -35,7 +35,7 @@ export default function LoginCard() {
           <LoginError />
         </Suspense>
         <Button 
-          onClick={() => signIn("google", { callbackUrl: "/register" })}
+          onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
           className="w-full flex items-center justify-center gap-2 bg-white text-gray-800 hover:bg-gray-100 border border-gray-300"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24">
