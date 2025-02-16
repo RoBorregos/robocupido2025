@@ -13,7 +13,7 @@ def prepare_user_data(profile_data: Dict[str, Any], preferences_data: Dict[str, 
         'age': profile_data['age'],
         'gender': profile_data['gender'],
         'matchPreferences': preferences_data['matchPreferences'],
-        'lookingFor': preferences_data['lookingFor'],
+        'lookingFor': preferences_data['lookingFor'] if preferences_data['lookingFor'] else 'casual',
         'dateOlder': preferences_data['dateOlder'],
         'dateYounger': preferences_data['dateYounger'],
         'activities': preferences_data['activities'],
@@ -35,17 +35,14 @@ def prepare_user_data(profile_data: Dict[str, Any], preferences_data: Dict[str, 
         'attentionToDetail': preferences_data['attentionToDetail'],
         'stressLevel': preferences_data['stressLevel'],
         'imagination': preferences_data['imagination'],
-        'textEmbeddings': {
-            'description': "",
-            'detailedDescription': embeddings_data['textEmbeddings']['detailedDescription'],
-            'attractiveTraits': embeddings_data['textEmbeddings']['attractiveTraits']
-        }
+        'selfDescription': embeddings_data['textEmbeddings']['detailedDescription'],
+        'attractedTo': embeddings_data['textEmbeddings']['attractiveTraits']
     }
 
 def calculate_max_possible_score(matchmaker: MatchMaker) -> float:
     """Calculate the maximum possible score based on weights"""
-    return 300
-    return sum(matchmaker.weights.values())
+    #return sum(matchmaker.weights.values())
+    return 376
 
 def generate_matches():
     # Load environment variables
@@ -73,12 +70,9 @@ def generate_matches():
     
     # Get preferences for these profiles
     complete_users = []
-    for profile in complete_profiles:  # Limit to 20 profiles
+    for profile in complete_profiles:
         preferences = preferences_collection.find_one({"profileId": profile["_id"]})
         embeddings = embeddings_collection.find_one({"profileId": profile["_id"]})
-        #print(f'embeddings: {embeddings}')
-        #user_data = prepare_user_data(profile, preferences, embeddings)
-        #complete_users.append(user_data)
         if preferences:
             try:
                 user_data = prepare_user_data(profile, preferences, embeddings)
@@ -87,7 +81,7 @@ def generate_matches():
                 print(f"Missing required field for profile {profile['_id']}: {e}")
                 continue
         
-    
+    # print all data except the embeddings columns
     print(f"Number of users with complete data: {len(complete_users)}")
     
     if not complete_users:
@@ -101,16 +95,21 @@ def generate_matches():
     
     # Process each user
     matches_collection = []
+    max_actual_score = 0
     
     for current_user_data in complete_users:
         current_user = User(current_user_data)
+        print("\n" + "="*50)
+        print(f"\nProcessing user {current_user_data['profileId']}...")
+        print(f'Gender: {current_user_data["gender"]}')
+        print(f'Looking for: {current_user_data["lookingFor"]}')
         
         # Initialize match categories
         matches = {
             "profileId": current_user_data["profileId"],
             "pareja": [],
             "casual": [],
-            "amigos": []
+            "amistad": []
         }
         
         # Find matches with other users
@@ -120,16 +119,23 @@ def generate_matches():
                 continue
                 
             potential_match = User(potential_match_data)
+            print(f"\nChecking match with user {potential_match_data['profileId']}...")
             
             # Calculate match score
             score = matchmaker.calculate_match_score(current_user, potential_match)
+            print(f"Match score: {score}")
             
             if score > 0:
                 # Convert score to percentage
+                max_actual_score = max(max_actual_score, score)
                 score_percentage = int((score / max_score) * 100)
                 
                 # Add to appropriate category based on lookingFor
-                match_type = potential_match_data["lookingFor"]
+                # Find intersection of lookingFor preferences, choose the first available match type if multiple
+                match_intersection = [value for value in current_user_data["lookingFor"] if value in potential_match_data["lookingFor"]]
+                #match_type = match_intersection[0] if match_intersection else None
+                match_type = current_user_data["lookingFor"]
+                print(f"Match type: {match_type}")
                 if match_type in matches:
                     matches[match_type].append({
                         "id": potential_match_data["profileId"],
@@ -137,13 +143,16 @@ def generate_matches():
                     })
         
         # Sort matches by score and keep top matches for each category
-        for category in ["pareja", "casual", "amigos"]:
+        # if an user only wants one category, we will keep the top 5 matches
+        # if an user wants two categories, we will keep the top 3 matches for each category
+        # if an user wants three categories, we will keep the top 2 matches for each category
+        for category in ["pareja", "casual", "amistad"]:
             if matches[category]:
                 matches[category] = sorted(
                     matches[category],
                     key=lambda x: x["score"],
                     reverse=True
-                )[:3]  # Keep top 3 matches
+                )[:4]
             else:
                 matches[category] = None
         
@@ -152,11 +161,11 @@ def generate_matches():
             "profileId": {"$oid": current_user_data["profileId"]},
             "pareja": None,
             "casual": None,
-            "amigos": None
+            "amistad": None
         }
         
         # Convert matches to MongoDB format
-        for category in ["pareja", "casual", "amigos"]:
+        for category in ["pareja", "casual", "amistad"]:
             if matches[category]:
                 mongodb_matches[category] = [
                     {
@@ -172,7 +181,7 @@ def generate_matches():
         print(f"\nMatches for user {current_user_data['profileId']}:")
         print(f"Gender: {current_user_data['gender']}")
         print(f"Looking for: {current_user_data['matchPreferences']}")
-        for category in ["pareja", "casual", "amigos"]:
+        for category in ["pareja", "casual", "amistad"]:
             if matches[category]:
                 print(f"\n{category.upper()} matches:")
                 for match in matches[category]:
@@ -193,6 +202,7 @@ def generate_matches():
     except Exception as e:
         print(f"Error storing matches in MongoDB: {e}")
     
+    print(f"\nMax actual score: {max_actual_score}")
     return matches_collection
 
 if __name__ == "__main__":
