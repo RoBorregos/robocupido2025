@@ -3,7 +3,7 @@ from matching import User, MatchMaker
 from typing import List, Dict, Any
 import os
 from dotenv import load_dotenv
-import pprint
+from bson import ObjectId
 
 def prepare_user_data(profile_data: Dict[str, Any], preferences_data: Dict[str, Any],
                         embeddings_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -42,7 +42,7 @@ def prepare_user_data(profile_data: Dict[str, Any], preferences_data: Dict[str, 
 def calculate_max_possible_score(matchmaker: MatchMaker) -> float:
     """Calculate the maximum possible score based on weights"""
     #return sum(matchmaker.weights.values())
-    return 376
+    return 420
 
 def generate_matches():
     # Load environment variables
@@ -96,13 +96,14 @@ def generate_matches():
     # Process each user
     matches_collection = []
     max_actual_score = 0
+    percentage_statistics = []
     
     for current_user_data in complete_users:
         current_user = User(current_user_data)
-        print("\n" + "="*50)
-        print(f"\nProcessing user {current_user_data['profileId']}...")
-        print(f'Gender: {current_user_data["gender"]}')
-        print(f'Looking for: {current_user_data["lookingFor"]}')
+        #print("\n" + "="*50)
+        #print(f"\nProcessing user {current_user_data['profileId']}...")
+        #print(f'Gender: {current_user_data["gender"]}')
+        #print(f'Looking for: {current_user_data["lookingFor"]}')
         
         # Initialize match categories
         matches = {
@@ -119,23 +120,26 @@ def generate_matches():
                 continue
                 
             potential_match = User(potential_match_data)
-            print(f"\nChecking match with user {potential_match_data['profileId']}...")
+            #print(f"\nChecking match with user {potential_match_data['profileId']}...")
             
             # Calculate match score
             score = matchmaker.calculate_match_score(current_user, potential_match)
-            print(f"Match score: {score}")
+            #print(f"Match score: {score}")
             
             if score > 0:
                 # Convert score to percentage
                 max_actual_score = max(max_actual_score, score)
-                score_percentage = int((score / max_score) * 100)
+                # make score percentage logaritmic so it is more fair
+                score_percentage = int((score / max_score) * 100) * 1.08
+                #score_percentage = 100 - max(0,(100 - score_percentage)) * (1/2)
+                score_percentage = max(50, min(100, score_percentage))
                 
                 # Add to appropriate category based on lookingFor
                 # Find intersection of lookingFor preferences, choose the first available match type if multiple
                 match_intersection = [value for value in current_user_data["lookingFor"] if value in potential_match_data["lookingFor"]]
                 #match_type = match_intersection[0] if match_intersection else None
                 match_type = current_user_data["lookingFor"]
-                print(f"Match type: {match_type}")
+                #print(f"Match type: {match_type}")
                 if match_type in matches:
                     matches[match_type].append({
                         "id": potential_match_data["profileId"],
@@ -158,7 +162,7 @@ def generate_matches():
         
         # Format matches for MongoDB
         mongodb_matches = {
-            "profileId": {"$oid": current_user_data["profileId"]},
+            "profileId": ObjectId(current_user_data["profileId"]),
             "pareja": None,
             "casual": None,
             "amistad": None
@@ -169,8 +173,8 @@ def generate_matches():
             if matches[category]:
                 mongodb_matches[category] = [
                     {
-                        "id": {"$oid": match["id"]},
-                        "score": {"$numberInt": str(match["score"])}
+                        "id": ObjectId(match["id"]),
+                        "score": int(match["score"])
                     }
                     for match in matches[category]
                 ]
@@ -185,10 +189,13 @@ def generate_matches():
             if matches[category]:
                 print(f"\n{category.upper()} matches:")
                 for match in matches[category]:
+                    percentage_statistics.append(match["score"])
                     match_data = next(u for u in complete_users if u["profileId"] == match["id"])
                     print(f"Match ID: {match['id']}")
                     print(f"Gender: {match_data['gender']}")
                     print(f"Compatibility: {match['score']}%")
+
+        print("\n" + "="*50)
     
     # Store matches in MongoDB
     try:
@@ -203,6 +210,17 @@ def generate_matches():
         print(f"Error storing matches in MongoDB: {e}")
     
     print(f"\nMax actual score: {max_actual_score}")
+    if percentage_statistics:
+        avg_score = sum(percentage_statistics) / len(percentage_statistics)
+        print(f"Average match score: {avg_score}")
+        median_score = sorted(percentage_statistics)[len(percentage_statistics) // 2]
+        print(f"Median match score: {median_score}")
+        lowest_score = min(percentage_statistics)
+        print(f"Lowest match score: {lowest_score}")
+        interquartile_range = percentage_statistics[int(0.75*len(percentage_statistics))] - percentage_statistics[int(0.25*len(percentage_statistics))]
+        print(f"Interquartile range: {interquartile_range}")
+        highest_score = max(percentage_statistics)
+        print(f"Highest match score: {highest_score}")
     return matches_collection
 
 if __name__ == "__main__":
@@ -211,6 +229,6 @@ if __name__ == "__main__":
     # Example of how the data would be stored in MongoDB
     if matches:
         print("\nExample MongoDB document structure:")
-        pprint.pprint(matches[0])
+        print(matches[0])
     else:
         print("\nNo matches generated!")
