@@ -37,11 +37,8 @@ class User:
             'stress_level': data['stressLevel'],
             'imagination': data['imagination'],
             # Text embeddings
-            'embeddings': {
-                'description': data['textEmbeddings']['description'],
-                'detailed_description': data['textEmbeddings']['detailedDescription'],
-                'attractive_traits': data['textEmbeddings']['attractiveTraits']
-            }
+            'self_description': data['selfDescription'],
+            'attracted_to': data['attractedTo']
         }
 
     def _parse_hobby_time(self, hobby_time: str) -> int:
@@ -58,17 +55,18 @@ class MatchMaker:
         # Weights for different matching criteria
         self.weights = {
             'activities_match': 50,
-            'social_compatibility': 40,
-            'hobby_time_compatibility': 30,
-            'values_compatibility': 100,
+            'social_compatibility': 30,
+            'hobby_time_compatibility': 10,
+            'values_compatibility': 150,
             'personality_traits': 80,
-            'conflict_resolution': 40,
+            'conflict_resolution': 30,
             'embedding_similarity': 100
         }
 
     def calculate_match_score(self, user1: User, user2: User) -> float:
         # Basic compatibility checks
         if not self._check_basic_compatibility(user1, user2):
+            print("Basic compatibility check failed")
             return 0
 
         score = 0
@@ -119,6 +117,8 @@ class MatchMaker:
                 return False
 
         # Relationship type compatibility
+        # Find an intersection between the two users' preferences
+        #if not set(user1.info['looking_for']) & set(user2.info['looking_for']):
         if user1.info['looking_for'] != user2.info['looking_for']:
             return False
 
@@ -132,9 +132,6 @@ class MatchMaker:
             # Higher score for similar high importance values
             if importance1 >= 4 and importance2 >= 4:
                 total_score += 1
-            # Penalty for mismatched importance
-            elif abs(importance1 - importance2) > 2:
-                total_score -= 0.5
         return max(total_score / len(user1.info['values_importance']), 0)
 
     def _calculate_personality_compatibility(self, user1: User, user2: User) -> float:
@@ -147,18 +144,13 @@ class MatchMaker:
 
     def _calculate_embedding_similarity(self, user1: User, user2: User) -> float:
         # Compare user1's attractive traits with user2's descriptions
-        if user1.info['embeddings']['attractive_traits'] and user2.info['embeddings']['detailed_description']:
+        if user1.info['attracted_to'] is not None and user2.info['self_description'] is not None:
             return self._cosine_similarity(
-                user1.info['embeddings']['attractive_traits'],
-                user2.info['embeddings']['detailed_description']
+                user1.info['attracted_to'],
+                user2.info['self_description']
             )
             
         return 0
 
     def _cosine_similarity(self, vec1: List[float], vec2: List[float]) -> float:
-        try:
-            # print data type of vec1 and vec2
-            dot_p = np.dot(vec1, vec2) / (np.linalg.norm(vec1) * np.linalg.norm(vec2))
-        except:
-            dot_p = 0
-        return dot_p
+        return np.dot(vec1, vec2) / (np.linalg.norm(vec1) * np.linalg.norm(vec2))
