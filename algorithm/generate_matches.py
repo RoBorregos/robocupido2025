@@ -3,41 +3,48 @@ from matching import User, MatchMaker
 from typing import List, Dict, Any
 import os
 from dotenv import load_dotenv
+import pprint
 
-def prepare_user_data(mongo_data: Dict[str, Any]) -> Dict[str, Any]:
+def prepare_user_data(profile_data: Dict[str, Any], preferences_data: Dict[str, Any],
+                        embeddings_data: Dict[str, Any]) -> Dict[str, Any]:
     """Transform MongoDB data into the format expected by the User class"""
     return {
-        'profileId': str(mongo_data['_id']),
-        'age': mongo_data['age'],
-        'gender': mongo_data['gender'],
-        'matchPreferences': mongo_data['matchPreferences'],
-        'lookingFor': mongo_data['lookingFor'],
-        'dateOlder': mongo_data['dateOlder'],
-        'dateYounger': mongo_data['dateYounger'],
-        'activities': mongo_data['activities'],
-        'socialPreference': mongo_data['socialPreference'],
-        'hobbyTime': mongo_data['hobbyTime'],
-        'honestyImportance': mongo_data['honestyImportance'],
-        'loyaltyImportance': mongo_data['loyaltyImportance'],
-        'kindnessImportance': mongo_data['kindnessImportance'],
-        'respectImportance': mongo_data['respectImportance'],
-        'openMindednessImportance': mongo_data['openMindednessImportance'],
-        'independenceImportance': mongo_data['independenceImportance'],
-        'ambitionImportance': mongo_data['ambitionImportance'],
-        'creativityImportance': mongo_data['creativityImportance'],
-        'humorImportance': mongo_data['humorImportance'],
-        'authenticityImportance': mongo_data['authenticityImportance'],
-        'empathyImportance': mongo_data['empathyImportance'],
-        'closenessEase': mongo_data['closenessEase'],
-        'conflictResolution': mongo_data['conflictResolution'],
-        'attentionToDetail': mongo_data['attentionToDetail'],
-        'stressLevel': mongo_data['stressLevel'],
-        'imagination': mongo_data['imagination'],
-        'textEmbeddings': mongo_data['textEmbeddings']
+        'profileId': str(profile_data['_id']),
+        'age': profile_data['age'],
+        'gender': profile_data['gender'],
+        'matchPreferences': preferences_data['matchPreferences'],
+        'lookingFor': preferences_data['lookingFor'],
+        'dateOlder': preferences_data['dateOlder'],
+        'dateYounger': preferences_data['dateYounger'],
+        'activities': preferences_data['activities'],
+        'socialPreference': preferences_data['socialPreference'],
+        'hobbyTime': preferences_data['hobbyTime'],
+        'honestyImportance': preferences_data['honestyImportance'],
+        'loyaltyImportance': preferences_data['loyaltyImportance'],
+        'kindnessImportance': preferences_data['kindnessImportance'],
+        'respectImportance': preferences_data['respectImportance'],
+        'openMindednessImportance': preferences_data['openMindednessImportance'],
+        'independenceImportance': preferences_data['independenceImportance'],
+        'ambitionImportance': preferences_data['ambitionImportance'],
+        'creativityImportance': preferences_data['creativityImportance'],
+        'humorImportance': preferences_data['humorImportance'],
+        'authenticityImportance': preferences_data['authenticityImportance'],
+        'empathyImportance': preferences_data['empathyImportance'],
+        'closenessEase': preferences_data['closenessEase'],
+        'conflictResolution': preferences_data['conflictResolution'],
+        'attentionToDetail': preferences_data['attentionToDetail'],
+        'stressLevel': preferences_data['stressLevel'],
+        'imagination': preferences_data['imagination'],
+        'textEmbeddings': {
+            'description': "",
+            'detailedDescription': embeddings_data['textEmbeddings']['detailedDescription'],
+            'attractiveTraits': embeddings_data['textEmbeddings']['attractiveTraits']
+        }
     }
 
 def calculate_max_possible_score(matchmaker: MatchMaker) -> float:
     """Calculate the maximum possible score based on weights"""
+    return 300
     return sum(matchmaker.weights.values())
 
 def generate_matches():
@@ -46,98 +53,73 @@ def generate_matches():
     
     # Connect to MongoDB
     client = MongoClient(os.getenv('MONGODB_URI'))
-    print(client.list_database_names())
     db = client['robocupido']
     
+    print(f"Available databases: {client.list_database_names()}")
+    print(f"Available collections: {db.list_collection_names()}")
+    
     # Get collections
-    profiles = db['profiles']
-    preferences = db['preferences']
-    embeddings = db['textEmbeddings']
-
-    # Get the number of users
-    num_users = profiles.count_documents({})
-    print(f'Number of users: {num_users}')
-
-    # Get a sample of 20 users with their complete data
-    pipeline = [
-        { "$sample": { "size": 20 } },
-        {
-            "$lookup": {
-                "from": "preferences",
-                "localField": "_id",
-                "foreignField": "profileId",
-                "as": "preferences"
-            }
-        },
-        {
-            "$lookup": {
-                "from": "textEmbeddings",
-                "localField": "_id",
-                "foreignField": "profileId",
-                "as": "embeddings"
-            }
-        },
-        { "$unwind": "$preferences" },
-        { "$unwind": "$embeddings" },
-        {
-            "$addFields": {
-                "matchPreferences": "$preferences.matchPreferences",
-                "lookingFor": "$preferences.lookingFor",
-                "dateOlder": "$preferences.dateOlder",
-                "dateYounger": "$preferences.dateYounger",
-                "activities": "$preferences.activities",
-                "socialPreference": "$preferences.socialPreference",
-                "hobbyTime": "$preferences.hobbyTime",
-                "honestyImportance": "$preferences.honestyImportance",
-                "loyaltyImportance": "$preferences.loyaltyImportance",
-                "kindnessImportance": "$preferences.kindnessImportance",
-                "respectImportance": "$preferences.respectImportance",
-                "openMindednessImportance": "$preferences.openMindednessImportance",
-                "independenceImportance": "$preferences.independenceImportance",
-                "ambitionImportance": "$preferences.ambitionImportance",
-                "creativityImportance": "$preferences.creativityImportance",
-                "humorImportance": "$preferences.humorImportance",
-                "authenticityImportance": "$preferences.authenticityImportance",
-                "empathyImportance": "$preferences.empathyImportance",
-                "closenessEase": "$preferences.closenessEase",
-                "conflictResolution": "$preferences.conflictResolution",
-                "attentionToDetail": "$preferences.attentionToDetail",
-                "stressLevel": "$preferences.stressLevel",
-                "imagination": "$preferences.imagination",
-                "textEmbeddings": "$embeddings.embeddings"
-            }
-        }
-    ]
-
-    users_data = list(profiles.aggregate(pipeline))
-    print(f'Users {users_data}')
+    profiles_collection = db.profiles
+    preferences_collection = db.preferences
+    embeddings_collection = db.text_embeddings
+    
+    # First get all profiles with complete data
+    complete_profiles = list(profiles_collection.find({
+        "age": {"$exists": True},
+        "gender": {"$exists": True}
+    }))
+    
+    print(f"Number of complete profiles: {len(complete_profiles)}")
+    
+    # Get preferences for these profiles
+    complete_users = []
+    for profile in complete_profiles:  # Limit to 20 profiles
+        preferences = preferences_collection.find_one({"profileId": profile["_id"]})
+        embeddings = embeddings_collection.find_one({"profileId": profile["_id"]})
+        #print(f'embeddings: {embeddings}')
+        #user_data = prepare_user_data(profile, preferences, embeddings)
+        #complete_users.append(user_data)
+        if preferences:
+            try:
+                user_data = prepare_user_data(profile, preferences, embeddings)
+                complete_users.append(user_data)
+            except KeyError as e:
+                print(f"Missing required field for profile {profile['_id']}: {e}")
+                continue
+        
+    
+    print(f"Number of users with complete data: {len(complete_users)}")
+    
+    if not complete_users:
+        print("No complete user data found!")
+        return []
     
     # Initialize MatchMaker
     matchmaker = MatchMaker()
     max_score = calculate_max_possible_score(matchmaker)
+    print(f"Max possible score: {max_score}")
     
     # Process each user
     matches_collection = []
     
-    for user_data in users_data:
-        # Prepare user data
-        current_user = User(prepare_user_data(user_data))
+    for current_user_data in complete_users:
+        current_user = User(current_user_data)
         
         # Initialize match categories
         matches = {
-            "profileId": user_data["_id"],
+            "profileId": current_user_data["profileId"],
             "pareja": [],
             "casual": [],
             "amigos": []
         }
         
         # Find matches with other users
-        for potential_match_data in users_data:
+        for potential_match_data in complete_users:
             # Skip self-matching
-            if str(user_data["_id"]) == str(potential_match_data["_id"]):
+            if current_user_data["profileId"] == potential_match_data["profileId"]:
                 continue
                 
-            potential_match = User(prepare_user_data(potential_match_data))
+            potential_match = User(potential_match_data)
             
             # Calculate match score
             score = matchmaker.calculate_match_score(current_user, potential_match)
@@ -147,10 +129,10 @@ def generate_matches():
                 score_percentage = int((score / max_score) * 100)
                 
                 # Add to appropriate category based on lookingFor
-                match_type = potential_match_data["preferences"]["lookingFor"]
+                match_type = potential_match_data["lookingFor"]
                 if match_type in matches:
                     matches[match_type].append({
-                        "id": potential_match_data["_id"],
+                        "id": potential_match_data["profileId"],
                         "score": score_percentage
                     })
         
@@ -165,15 +147,51 @@ def generate_matches():
             else:
                 matches[category] = None
         
-        matches_collection.append(matches)
+        # Format matches for MongoDB
+        mongodb_matches = {
+            "profileId": {"$oid": current_user_data["profileId"]},
+            "pareja": None,
+            "casual": None,
+            "amigos": None
+        }
+        
+        # Convert matches to MongoDB format
+        for category in ["pareja", "casual", "amigos"]:
+            if matches[category]:
+                mongodb_matches[category] = [
+                    {
+                        "id": {"$oid": match["id"]},
+                        "score": {"$numberInt": str(match["score"])}
+                    }
+                    for match in matches[category]
+                ]
+        
+        matches_collection.append(mongodb_matches)
         
         # Debug print
-        print(f"\nMatches for user {user_data['_id']}:")
+        print(f"\nMatches for user {current_user_data['profileId']}:")
+        print(f"Gender: {current_user_data['gender']}")
+        print(f"Looking for: {current_user_data['matchPreferences']}")
         for category in ["pareja", "casual", "amigos"]:
             if matches[category]:
                 print(f"\n{category.upper()} matches:")
                 for match in matches[category]:
-                    print(f"Match ID: {match['id']}, Compatibility: {match['score']}%")
+                    match_data = next(u for u in complete_users if u["profileId"] == match["id"])
+                    print(f"Match ID: {match['id']}")
+                    print(f"Gender: {match_data['gender']}")
+                    print(f"Compatibility: {match['score']}%")
+    
+    # Store matches in MongoDB
+    try:
+        matches_collection_db = db.matches
+        # Clear existing matches
+        matches_collection_db.delete_many({})
+        # Insert new matches
+        if matches_collection:
+            matches_collection_db.insert_many(matches_collection)
+            print(f"\nSuccessfully stored {len(matches_collection)} match documents in MongoDB")
+    except Exception as e:
+        print(f"Error storing matches in MongoDB: {e}")
     
     return matches_collection
 
@@ -181,6 +199,8 @@ if __name__ == "__main__":
     matches = generate_matches()
     
     # Example of how the data would be stored in MongoDB
-    example_match = matches
-    print("\nExample MongoDB document structure:")
-    print(example_match) 
+    if matches:
+        print("\nExample MongoDB document structure:")
+        pprint.pprint(matches[0])
+    else:
+        print("\nNo matches generated!")

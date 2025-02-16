@@ -149,11 +149,16 @@ class MatchMaker:
         # Compare user1's attractive traits with user2's descriptions
         if user1.info['embeddings']['attractive_traits'] and user2.info['embeddings']['detailed_description']:
             return self._cosine_similarity(
-                user1.info['embeddings']['attractive_traits'], 
+                user1.info['embeddings']['attractive_traits'],
                 user2.info['embeddings']['detailed_description']
             )
             
         return 0
 
     def _cosine_similarity(self, vec1: List[float], vec2: List[float]) -> float:
-        return np.dot(vec1, vec2) / (np.linalg.norm(vec1) * np.linalg.norm(vec2))
+        try:
+            # print data type of vec1 and vec2
+            dot_p = np.dot(vec1, vec2) / (np.linalg.norm(vec1) * np.linalg.norm(vec2))
+        except:
+            dot_p = 0
+        return dot_p
