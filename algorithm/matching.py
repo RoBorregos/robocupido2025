@@ -16,7 +16,7 @@ class User:
             'date_younger': data['dateYounger'] == 'si',
             'activities': data['activities'],
             'social_preference': data['socialPreference'],
-            'hobby_time': self._parse_hobby_time(data['hobbyTime']),
+            'hobby_time': self.parse_hobby_time(data['hobbyTime']),
             # Importance scores (0-6)
             'values_importance': {
                 'honesty': data['honestyImportance'],
@@ -41,7 +41,8 @@ class User:
             'attracted_to': data['attractedTo']
         }
 
-    def _parse_hobby_time(self, hobby_time: str) -> int:
+    def parse_hobby_time(self, hobby_time: str) -> int:
+        """Parse hobby time string to integer value."""
         mapping = {
             'menos-5': 2.5,
             '5-10': 7.5,
@@ -65,6 +66,7 @@ class MatchMaker:
         }
 
     def calculate_match_score(self, user1: User, user2: User) -> float:
+        """Main method to calculate the score."""
         if not self._check_basic_compatibility(user1, user2):
             return 0
 
@@ -101,7 +103,7 @@ class MatchMaker:
         return score
 
     def _check_basic_compatibility(self, user1: User, user2: User) -> bool:
-        # Age compatibility
+        """Check age, gender and relationship type compatibility."""
         if (not user1.info['date_older'] and user2.info['age'] > user1.info['age']) or \
            (not user1.info['date_younger'] and user2.info['age'] < user1.info['age']):
             return False
@@ -120,7 +122,6 @@ class MatchMaker:
             'no-binario': 'NB',
             'prefiero-no-decirlo': 'ND'
         }
-        # Handle 'indiferente' preference
         user1_prefs = []
         if 'indiferente' in user1.info['match_preferences']:
             user1_prefs = ['M', 'W', 'NB', 'ND']
@@ -134,18 +135,18 @@ class MatchMaker:
             for pref in user2.info['match_preferences']:
                 user2_prefs.append(gender_map[pref])
 
-        if gender_map[user2.info['gender']] not in user1_prefs or gender_map[user1.info['gender']] not in user2_prefs:
+        if gender_map[user2.info['gender']] not in user1_prefs or \
+           gender_map[user1.info['gender']] not in user2_prefs:
             return False
 
         # Relationship type compatibility
-        # Find an intersection between the two users' preferences
-        #if not set(user1.info['looking_for']) & set(user2.info['looking_for']):
         if user1.info['looking_for'] != user2.info['looking_for']:
             return False
 
         return True
 
     def _calculate_values_compatibility(self, user1: User, user2: User) -> float:
+        """Calculate compatibility based on values importance."""
         total_score = 0
         for value in user1.info['values_importance']:
             importance1 = user1.info['values_importance'][value]
@@ -156,6 +157,7 @@ class MatchMaker:
         return max(total_score / len(user1.info['values_importance']), 0)
 
     def _calculate_personality_compatibility(self, user1: User, user2: User) -> float:
+        """Calculate compatibility based on personality traits."""
         traits = ['closeness_ease', 'attention_to_detail', 'stress_level', 'imagination']
         total_score = 0
         for trait in traits:
@@ -164,13 +166,12 @@ class MatchMaker:
         return total_score / len(traits)
 
     def _calculate_embedding_similarity(self, user1: User, user2: User) -> float:
-        # Compare user1's attractive traits with user2's descriptions
+        """Calculate compatibility based on open-ended questions."""
         if user1.info['attracted_to'] is not None and user2.info['self_description'] is not None:
             return self._cosine_similarity(
                 user1.info['attracted_to'],
                 user2.info['self_description']
             )
-            
         return 0
 
     def _cosine_similarity(self, vec1: List[float], vec2: List[float]) -> float:

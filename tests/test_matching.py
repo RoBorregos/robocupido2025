@@ -189,7 +189,7 @@ class TestMatching(unittest.TestCase):
         }
         
         for input_val, expected in test_cases.items():
-            result = self.user1._parse_hobby_time(input_val)
+            result = self.user1.parse_hobby_time(input_val)
             self.assertEqual(result, expected)
 
     def test_gender_preference_compatibility(self):
@@ -280,16 +280,4 @@ class TestMatching(unittest.TestCase):
         self.matchmaker.weights['activities_match'] = original_weight
 
 if __name__ == '__main__':
-    unittest.main() 
-
-
-
-
-
-
-"""
-,"profileId":{"$oid":"67b1a0829451a7998d5bfbbd"},"description":"Ya me voy a graduar :D me gusta viajar, platicar, salir, hacer ejercicio.","matchPreferences":["mujeres","hombres"],"lookingFor":"amistad","dateOlder":"si","dateYounger":"si","activities":["deportes","viajar","leer"],"socialPreference":{"$numberInt":"5"},"hobbyTime":"5-10","honestyImportance":{"$numberInt":"5"},"loyaltyImportance":{"$numberInt":"4"},"kindnessImportance":{"$numberInt":"6"},"respectImportance":{"$numberInt":"6"},"openMindednessImportance":{"$numberInt":"3"},"independenceImportance":{"$numberInt":"5"},"ambitionImportance":{"$numberInt":"4"},"creativityImportance":{"$numberInt":"4"},"humorImportance":{"$numberInt":"3"},"authenticityImportance":{"$numberInt":"5"},"empathyImportance":{"$numberInt":"6"},"closenessEase":{"$numberInt":"5"},"conflictResolution":"compromising","attentionToDetail":{"$numberInt":"5"},"stressLevel":{"$numberInt":"2"},"imagination":{"$numberInt":"4"},"shareDetailedInfo":"no","detailedDescription":"","attractiveTraits":".","createdAt":{"$date":{"$numberLong":"1739162052720"}},"lastUpdated":{"$date":{"$numberLong":"1739162052720"}}}
-{"_id":{"$oid":"67aa07e1aac9a482aaf3f8a0"},"profileId":{"$oid":"67b1a0829451a7998d5bfbbd"},"textEmbeddings":{"description":null,"detailedDescription":null,"attractiveTraits":null},"createdAt":{"$date":{"$numberLong":"1739196385229"}},"lastUpdated":{"$date":{"$numberLong":"1739196385229"}}}
-{_id:ObjectId('67b1a0829451a7998d5bfbbd')}
-67a981c4448aae0366059321
-"""
+    unittest.main()
