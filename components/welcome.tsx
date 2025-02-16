@@ -7,6 +7,7 @@ import styles from './/font.module.css'
 // import { useSession } from "next-auth/react"
 // import { useRouter } from "next/navigation"
 import { CountdownTimer } from "./CountdownTimer"
+import LoginCard from "./LoginCard"
 
 const tangerine = Tangerine({ subsets: ["latin"], weight: ["400", "700"] });
 
@@ -40,23 +41,24 @@ const Welcome = () => {
                         height={400}
                         className="mb-1"
                     />
-                    <h1 className={`text-5xl ${styles.tangerineParagraph} ${tangerine.className}`}>Robocupido</h1>
+                    <h1 className={`text-5xl ${styles.tangerineParagraph} ${tangerine.className} mt-5`}>Robocupido</h1>
                     <p className={`text-2xl text-gray-900 text-md ${styles.tangerineParagraph} ${tangerine.className}`}>by Roborregos</p>
                 </div>
 
                 {/* Seccion derecha con el texto */}
                 <div className="w-1/2 p-6 flex flex-col justify-center relative">
-                    <h2 className='text-lg font-bold text-gray-800 relative text-center'>Find your perfect match for Valentine’s Day!</h2>
+                    {/* <h2 className='text-lg font-bold text-gray-800 relative text-center'>Find your perfect match for Valentine’s Day!</h2>
                     <p className="text-gray-700 text-md mt-2 relative text-center">
                         Our AI-powered matchmaking system will pair you with your ideal partner.
-                    </p>
+                    </p> */}
                     {/* <p className="text-gray-800 text-md font-semibold mt-6 relative text-center">Register now and get matched on February 15th!</p>
                     
                     <Button size="lg" className="text-lg px-8 py-6" onClick={handleRegisterClick}>
                         Register Now!
                     </Button>
-                <PrivacyPopup isOpen={isPrivacyPopupOpen} onClose={handleClosePrivacyPopup} /> */}
-                <CountdownTimer />
+                    <PrivacyPopup isOpen={isPrivacyPopupOpen} onClose={handleClosePrivacyPopup} /> */}
+                    {/* <CountdownTimer /> */}
+                    <LoginCard />
                 </div>
             </div>
         </div>

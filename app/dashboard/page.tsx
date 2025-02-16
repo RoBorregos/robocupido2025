@@ -4,11 +4,8 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { signOut } from "next-auth/react"
 
-// import { redirect } from "next/navigation";
-
 export default function DashboardPage() {
   
-  // redirect("/");
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-b from-pink-100 to-red-100">
       <header className="bg-white shadow-md">
@@ -16,11 +13,13 @@ export default function DashboardPage() {
           <Link
             href="/"
             className="flex items-center gap-2 text-2xl font-bold text-primary"
-          >
+            >
             <span>Robocupido 2025</span>
           </Link>
           <nav>
-            <Button onClick={() => signOut()} variant="outline">
+            <Button onClick={() => {
+              signOut({callbackUrl: "/"});
+            }} variant="outline">
              Cerrar Sesión
             </Button>
           </nav>
