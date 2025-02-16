@@ -1,10 +1,10 @@
-#import pandas as pd
-import numpy as np
-#from openai import OpenAI
-import os
+"""Matching weighted algorithm for finding a compatibility score between users 
+based on their profiles."""
 from typing import Dict, List
+import numpy as np
 
 class User:
+    """Data object to store user profile information."""
     def __init__(self, data: Dict):
         self.info = {
             'id': data['profileId'],
@@ -51,22 +51,21 @@ class User:
         return mapping.get(hobby_time, 7.5)
 
 class MatchMaker:
+    """Collection of methods to calculate compatibility score between two users."""
     def __init__(self):
         # Weights for different matching criteria
         self.weights = {
-            'activities_match': 50,
+            'activities_match': 60,
             'social_compatibility': 30,
-            'hobby_time_compatibility': 10,
-            'values_compatibility': 150,
-            'personality_traits': 80,
+            'hobby_time_compatibility': 5,
+            'values_compatibility': 180,
+            'personality_traits': 90,
             'conflict_resolution': 30,
             'embedding_similarity': 100
         }
 
     def calculate_match_score(self, user1: User, user2: User) -> float:
-        # Basic compatibility checks
         if not self._check_basic_compatibility(user1, user2):
-            print("Basic compatibility check failed")
             return 0
 
         score = 0
@@ -106,15 +105,37 @@ class MatchMaker:
         if (not user1.info['date_older'] and user2.info['age'] > user1.info['age']) or \
            (not user1.info['date_younger'] and user2.info['age'] < user1.info['age']):
             return False
+        
+        if (not user2.info['date_older'] and user1.info['age'] > user2.info['age']) or \
+           (not user2.info['date_younger'] and user1.info['age'] < user2.info['age']):
+            return False
 
         # Gender preference compatibility
+        gender_map = {
+            'hombres': 'M',
+            'mujeres': 'W',
+            'no-binarias': 'NB',
+            'masculino': 'M',
+            'femenino': 'W',
+            'no-binario': 'NB',
+            'prefiero-no-decirlo': 'ND'
+        }
         # Handle 'indiferente' preference
-        user1_prefs = user1.info['match_preferences']
-        user2_prefs = user2.info['match_preferences']
-        
-        if 'indiferente' not in user1_prefs and 'indiferente' not in user2_prefs:
-            if user2.info['gender'] not in user1_prefs or user1.info['gender'] not in user2_prefs:
-                return False
+        user1_prefs = []
+        if 'indiferente' in user1.info['match_preferences']:
+            user1_prefs = ['M', 'W', 'NB', 'ND']
+        else:
+            for pref in user1.info['match_preferences']:
+                user1_prefs.append(gender_map[pref])
+        user2_prefs = []
+        if 'indiferente' in user2.info['match_preferences']:
+            user2_prefs = ['M', 'W', 'NB', 'ND']
+        else:
+            for pref in user2.info['match_preferences']:
+                user2_prefs.append(gender_map[pref])
+
+        if gender_map[user2.info['gender']] not in user1_prefs or gender_map[user1.info['gender']] not in user2_prefs:
+            return False
 
         # Relationship type compatibility
         # Find an intersection between the two users' preferences
