@@ -204,6 +204,7 @@ interface Match {
   interests: string[];
   instagram: string;
   whatsapp: string;
+  gender: string;
 }
 
 export interface MatchResponse {
@@ -247,6 +248,7 @@ export async function getMatches(userId: string): Promise<MatchResponse> {
         interests: (preferences?.activities as string[]) || [],
         instagram: profile?.instagram as string,
         whatsapp: profile?.phone as string,
+        gender: profile?.gender as string,
       };
     }
 

@@ -8,7 +8,7 @@ export default function Home() {
     <main>
             <HeartParticles />
             <Welcome />
-            {/* <Header/> */}
+            <Header/>
         </main>
   )
 }

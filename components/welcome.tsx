@@ -6,7 +6,7 @@ import Image from 'next/image'
 import styles from './/font.module.css'
 // import { useSession } from "next-auth/react"
 // import { useRouter } from "next/navigation"
-import { CountdownTimer } from "./CountdownTimer"
+// import { CountdownTimer } from "./CountdownTimer"
 import LoginCard from "./LoginCard"
 
 const tangerine = Tangerine({ subsets: ["latin"], weight: ["400", "700"] });

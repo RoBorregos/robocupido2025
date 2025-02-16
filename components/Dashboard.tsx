@@ -30,63 +30,74 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { getMatches } from "@/app/actions";
 
+  type matchesDataType = {
+    name: string;
+    age: number;
+    compatibility: number;
+    interests: string[];
+    instagram: string;
+    whatsapp: string;
+    gender: string;
+  }
+
   // Enhanced mock data for demonstration
-  const mockMatches = {
-    pareja: [
-      {
-        name: "María García",
-        age: 28,
-        compatibility: 95,
-        interests: ["Música", "Lectura", "Viajes"],
-        instagram: "@maria_garcia",
-        whatsapp: "+52 1 55 1234 5678",
-      },
-      {
-      name: "María García",
-      age: 28,
-      compatibility: 95,
-      interests: ["Música", "Lectura", "Viajes"],
-      instagram: "@maria_garcia",
-      whatsapp: "+52 1 55 1234 5678",
-      },
-      {
-        name: "María García",
-        age: 28,
-        compatibility: 95,
-        interests: ["Música", "Lectura", "Viajes"],
-        instagram: "@maria_garcia",
-        whatsapp: "+52 1 55 1234 5678",
-      },
-    ],
-    amigos: [
-      {
-        name: "María García",
-        age: 28,
-        compatibility: 95,
-        interests: ["Música", "Lectura", "Viajes"],
-        instagram: "@maria_garcia",
-        whatsapp: "+52 1 55 1234 5678",
-      },
-      {
-        name: "María García",
-        age: 28,
-        compatibility: 95,
-        interests: ["Música", "Lectura", "Viajes"],
-        instagram: "@maria_garcia",
-        whatsapp: "+52 1 55 1234 5678",
-      },
-      {
-        name: "María García",
-        age: 28,
-        compatibility: 95,
-        interests: ["Música", "Lectura", "Viajes"],
-        instagram: "@maria_garcia",
-        whatsapp: "+52 1 55 1234 5678",
-      },
-    ],
-    casual: [
-    ],
-  };
+  // const mockMatches = {
+  //   pareja: [
+  //     {
+  //       name: "María García",
+  //       age: 28,
+  //       compatibility: 95,
+  //       interests: ["Música", "Lectura", "Viajes"],
+  //       instagram: "@maria_garcia",
+  //       whatsapp: "+52 1 55 1234 5678",
+  //     },
+  //     {
+  //     name: "María García",
+  //     age: 28,
+  //     compatibility: 95,
+  //     interests: ["Música", "Lectura", "Viajes"],
+  //     instagram: "@maria_garcia",
+  //     whatsapp: "+52 1 55 1234 5678",
+  //     gender: 'Femenino'
+  //     },
+  //     {
+  //       name: "María García",
+  //       age: 28,
+  //       compatibility: 95,
+  //       interests: ["Música", "Lectura", "Viajes"],
+  //       instagram: "@maria_garcia",
+  //       whatsapp: "+52 1 55 1234 5678",
+  //     },
+  //   ],
+  //   amigos: [
+  //     {
+  //       name: "María García",
+  //       age: 28,
+  //       compatibility: 95,
+  //       interests: ["Música", "Lectura", "Viajes"],
+  //       instagram: "@maria_garcia",
+  //       whatsapp: "+52 1 55 1234 5678",
+  //     },
+  //     {
+  //       name: "María García",
+  //       age: 28,
+  //       compatibility: 95,
+  //       interests: ["Música", "Lectura", "Viajes"],
+  //       instagram: "@maria_garcia",
+  //       whatsapp: "+52 1 55 1234 5678",
+  //     },
+  //     {
+  //       name: "María García",
+  //       age: 28,
+  //       compatibility: 95,
+  //       interests: ["Música", "Lectura", "Viajes"],
+  //       instagram: "@maria_garcia",
+  //       whatsapp: "+52 1 55 1234 5678",
+  //     },
+  //   ],
+  //   casual: [
+  //   ],
+  // };
 
   type MatchType = "pareja" | "amigos" | "casual";
 
@@ -109,7 +120,7 @@ import { getMatches } from "@/app/actions";
     match,
     type,
   }: {
-    match: Partial<(typeof mockMatches.pareja)[0]>;
+    match: matchesDataType;
     type: MatchType;
   }) => (
     <Card className="mb-6">
