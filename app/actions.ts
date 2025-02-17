@@ -77,7 +77,7 @@ export async function registerUser(formData: FormData) {
       profileId: profileId,
       description,
       matchPreferences: formData.getAll("matchPreferences"),
-      lookingFor: formData.get("lookingFor"),
+      lookingFor: formData.getAll("lookingFor"),
       dateOlder: formData.get("dateOlder"),
       dateYounger: formData.get("dateYounger"),
       activities: formData.getAll("activities"),
